@@ -44,7 +44,7 @@ int main(int argc, char** argv) {
       if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) || IsKeyDown(KEY_Z))
         canvasAddPixel(canvas, brush);
 
-      //User input: w: write
+      //User input: F3: write
       if (IsKeyPressed(KEY_F3))
         exportCanvas(canvas);
 
