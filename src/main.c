@@ -48,6 +48,14 @@ int main(int argc, char** argv) {
       if (IsKeyPressed(KEY_F3))
         exportCanvas(canvas);
 
+      //User input: A: increase brush size, with shift: decrease brush size
+      if (IsKeyPressed(KEY_A)) {
+        if (IsKeyDown(KEY_LEFT_SHIFT)) {
+          if (brush.size > 1) brush.size -= 0.5;
+        }
+        else brush.size += 0.5;
+      }
+
     BeginTextureMode(renderCanvas);
       ClearBackground(RAYWHITE);
       drawCanvas(canvas);
