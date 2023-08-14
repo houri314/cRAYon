@@ -68,8 +68,15 @@ int main(int argc, char** argv) {
         SetWindowOpacity(windowOpacity);
       }
 
+      //User input: Tab: switch brush color
+      if (IsKeyPressed(KEY_TAB)) {
+        brush.col.r = ~brush.col.r;
+        brush.col.g = ~brush.col.g;
+        brush.col.b = ~brush.col.b;
+      }
+
     BeginTextureMode(renderCanvas);
-      ClearBackground(RAYWHITE);
+      ClearBackground(WHITE);
       drawCanvas(canvas);
     EndTextureMode();
     BeginDrawing();
