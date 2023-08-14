@@ -24,6 +24,7 @@ int main(int argc, char** argv) {
   };
   RenderTexture renderCanvas = LoadRenderTexture(800, 600);
   Image icon = LoadImageFromTexture(renderCanvas.texture);
+  float windowOpacity = 1.0f;
   while (!WindowShouldClose()) {
       brush.pos = GetMousePosition();
 
@@ -54,6 +55,17 @@ int main(int argc, char** argv) {
           if (brush.size > 1) brush.size -= 0.5;
         }
         else brush.size += 0.5;
+      }
+
+      //User input: T: increase window opacity, with shift: decrease window opacity
+      if (IsKeyPressed(KEY_T)) {
+        if (IsKeyDown(KEY_LEFT_SHIFT)) {
+          if (windowOpacity > 0) windowOpacity -= 0.2;
+        }
+        else {
+          if (windowOpacity < 1) windowOpacity += 0.2;
+        }
+        SetWindowOpacity(windowOpacity);
       }
 
     BeginTextureMode(renderCanvas);
