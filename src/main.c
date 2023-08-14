@@ -13,16 +13,34 @@ void updateTitle(const PixelData* brush) {
 }
 
 int main(int argc, char** argv) {
-  SetTraceLogLevel(LOG_ALL);
-  SetConfigFlags(FLAG_VSYNC_HINT);
-  InitWindow(800, 600, "cRAYon");
+  //Create a window for choosing canvas size.
+  SetConfigFlags(FLAG_VSYNC_HINT | FLAG_WINDOW_RESIZABLE);
+  InitWindow(800, 600, "cRAYon - resize window and press O to open new canvas");
 
+  Vector2 windowSize;
+  while (!IsKeyPressed(KEY_O)) {
+    windowSize = (Vector2){
+      .x = GetRenderWidth(),
+      .y = GetRenderHeight()
+    };
+    BeginDrawing();
+      ClearBackground(WHITE);
+    EndDrawing();
+      //Exit if exit event received (if I put this as while() condition
+      //the canvas window will open on exit).
+      if (WindowShouldClose()) return 0;
+  }
+  CloseWindow();
+
+  //Create the actual window for painting.
+  SetConfigFlags(FLAG_VSYNC_HINT);
+  InitWindow(windowSize.x, windowSize.y, "cRAYon");
   Canvas* canvas = newCanvas();
   PixelData brush = {
     .size = 10.0f,
     .col = BLACK
   };
-  RenderTexture renderCanvas = LoadRenderTexture(800, 600);
+  RenderTexture renderCanvas = LoadRenderTexture(windowSize.x, windowSize.y);
   Image icon = LoadImageFromTexture(renderCanvas.texture);
   float windowOpacity = 1.0f;
   while (!WindowShouldClose()) {
@@ -82,8 +100,8 @@ int main(int argc, char** argv) {
     BeginDrawing();
       DrawTexturePro(
         renderCanvas.texture,
-        (Rectangle){0, 600, 800, -600},
-        (Rectangle){0, 0, 800, 600},
+        (Rectangle){0, windowSize.y, windowSize.x, -windowSize.y},
+        (Rectangle){0, 0, windowSize.x, windowSize.y},
         (Vector2){0, 0},
         0,
         WHITE
