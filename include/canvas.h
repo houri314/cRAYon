@@ -15,4 +15,6 @@ void canvasBrush(Canvas*, const BrushData*);
 void updateCanvas(Canvas*);
 void exportCanvas(const Canvas*);
 
+Color canvasGetColor(const Canvas*, Vector2);
+
 #endif  //CANVAS_H

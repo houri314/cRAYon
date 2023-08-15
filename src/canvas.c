@@ -10,6 +10,10 @@ void updateCanvas(Canvas* cv) {
   UpdateTexture(cv->texture, cv->image.data);
 }
 
+Color canvasGetColor(const Canvas* cv, Vector2 v) {
+  return GetImageColor(cv->image, v.x, v.y);
+}
+
 /*
  * First solution for a malloc-less canvas.
  * This has its own flaws, since the Image struct is just
