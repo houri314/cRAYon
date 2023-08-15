@@ -14,5 +14,5 @@ static size_t hashCanvas(const Canvas* cv) {
 }
 
 void exportCanvas(const Canvas* cv) {
-  ExportImage(cv->image, TextFormat("%llu.png", hashCanvas(cv)));
+  ExportImage(cv->image, TextFormat("%lu.png", hashCanvas(cv)));
 }
