@@ -4,9 +4,9 @@
 #include <string.h>
 
 #include <canvas.h>
-#include <pixel.h>
+#include <brush.h>
 
-void updateTitle(const PixelData* brush) {
+void updateTitle(const BrushData* brush) {
   SetWindowTitle(
       TextFormat("cRAYon - brush size: %g, color: #%08x", brush->size, ColorToInt(brush->col))
       );
@@ -33,16 +33,18 @@ int main(int argc, char** argv) {
   CloseWindow();
 
   //Create the actual window for painting.
-  SetConfigFlags(FLAG_VSYNC_HINT);
-  InitWindow(windowSize.x, windowSize.y, "cRAYon");
-  Canvas* canvas = newCanvas();
-  PixelData brush = {
+  BrushData brush = {
     .size = 10.0f,
     .col = BLACK
   };
-  RenderTexture renderCanvas = LoadRenderTexture(windowSize.x, windowSize.y);
-  Image icon = LoadImageFromTexture(renderCanvas.texture);
   float windowOpacity = 1.0f;
+  SetConfigFlags(FLAG_VSYNC_HINT);
+  InitWindow(windowSize.x, windowSize.y, "cRAYon");
+
+  Canvas canvas;
+  canvas.image = GenImageColor(windowSize.x, windowSize.y, WHITE);
+  canvas.texture = LoadTextureFromImage(canvas.image);
+
   while (!WindowShouldClose()) {
       brush.pos = GetMousePosition();
 
@@ -51,21 +53,16 @@ int main(int argc, char** argv) {
 
       //Sets canvas as window icon on pen up.
       if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT) || IsKeyReleased(KEY_Z)) {
-        if (IsImageReady(icon))
-          UnloadImage(icon);
-        canvas->img = &icon;
-        icon = LoadImageFromTexture(renderCanvas.texture);
-        ImageFlipVertical(&icon);
-        SetWindowIcon(icon);
+        SetWindowIcon(canvas.image);
       }
 
       //User input: left mouse/Z: pen down.
       if (IsMouseButtonDown(MOUSE_BUTTON_LEFT) || IsKeyDown(KEY_Z))
-        canvasAddPixel(canvas, brush);
+        canvasBrush(&canvas, &brush);
 
       //User input: F3: write
       if (IsKeyPressed(KEY_F3))
-        exportCanvas(canvas);
+        exportCanvas(&canvas);
 
       //User input: A: increase brush size, with shift: decrease brush size
       if (IsKeyPressed(KEY_A)) {
@@ -93,19 +90,10 @@ int main(int argc, char** argv) {
         brush.col.b = ~brush.col.b;
       }
 
-    BeginTextureMode(renderCanvas);
-      ClearBackground(WHITE);
-      drawCanvas(canvas);
-    EndTextureMode();
+      updateCanvas(&canvas);
+
     BeginDrawing();
-      DrawTexturePro(
-        renderCanvas.texture,
-        (Rectangle){0, windowSize.y, windowSize.x, -windowSize.y},
-        (Rectangle){0, 0, windowSize.x, windowSize.y},
-        (Vector2){0, 0},
-        0,
-        WHITE
-      );
+      drawCanvas(&canvas);
     EndDrawing();
   }
 

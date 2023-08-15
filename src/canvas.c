@@ -2,43 +2,29 @@
 #include <raylib.h>
 #include <stdlib.h>
 
-Canvas* newCanvas() {
-  Canvas* cv = malloc(sizeof(Canvas));
-  cv->first = cv->current = NULL;
-  cv->pixelCount = 0;
-
-  return cv;
+void drawCanvas(const Canvas* cv) {
+  DrawTexture(cv->texture, 0, 0, WHITE);
 }
 
-void drawCanvas(const Canvas* cv) {
-  if (cv->pixelCount == 0)
-    return;
-
-  PixelData* tmp = cv->first;
-  for (size_t i=0; i<cv->pixelCount; i++) {
-    if (tmp == NULL)
-      return;
-    DrawCircleV(tmp->pos, tmp->size, tmp->col);
-    tmp = tmp->next;
-  }
+void updateCanvas(Canvas* cv) {
+  UpdateTexture(cv->texture, cv->image.data);
 }
 
 /*
- * I'm really unsatisfied with the implementation of this function.
- * Everytime I tried it gives some weird errors so I have to resort to
- * writing this ugly thing.
+ * First solution for a malloc-less canvas.
+ * This has its own flaws, since the Image struct is just
+ * a glorified void pointer to the data stored in RAM, it's
+ * prone to array problems (out of bound), causing weird stuff drawing
+ * near the vertical borders and segfaults drawing near the horizontal 
+ * borders. I solved it by clamping the cursor between the borders with
+ * THRESHOLD. This isn't the best practice but it kinda works now (for a
+ * prototype at least).
  */
-void canvasAddPixel(Canvas* cv, PixelData data) {
-  if (!cv->current)
-    cv->current = malloc(sizeof(PixelData));
-  cv->current->pos = data.pos;
-  cv->current->size = data.size;
-  cv->current->col = data.col;
-
-  if (cv->pixelCount == 0)
-    cv->first = cv->current;
-
-  cv->current->next = malloc(sizeof(PixelData));
-  cv->current = cv->current->next;
-  cv->pixelCount++;
+#define THRESHOLD 2.5
+void canvasBrush(Canvas* cv, const BrushData* brush) {
+  if (brush->pos.x + brush->size > cv->image.width - THRESHOLD) return;
+  if (brush->pos.x - brush->size < THRESHOLD) return;
+  if (brush->pos.y + brush->size > cv->image.height - THRESHOLD) return;
+  if (brush->pos.y - brush->size < THRESHOLD) return;
+  ImageDrawCircleV(&(cv->image), brush->pos, brush->size, brush->col);
 }

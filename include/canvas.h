@@ -1,20 +1,18 @@
 #ifndef CANVAS_H
 #define CANVAS_H
-#include <pixel.h>
+#include <brush.h>
 #include <raylib.h>
 #include <stdint.h>
 #include <stddef.h>
 
 typedef struct {
-  PixelData* first;
-  PixelData* current;
-  Image* img;
-  size_t pixelCount;
+  Image image;
+  Texture2D texture;
 } Canvas;
 
-Canvas* newCanvas();
 void drawCanvas(const Canvas*);
-void canvasAddPixel(Canvas*, PixelData);
+void canvasBrush(Canvas*, const BrushData*);
+void updateCanvas(Canvas*);
 void exportCanvas(const Canvas*);
 
 #endif  //CANVAS_H
