@@ -4,10 +4,15 @@
 
 static size_t hashCanvas(const Canvas* cv) {
   size_t res = 0;
-  //TODO: fill this later.
+  for (size_t x=0; x<cv->image.width; x++) {
+    for (size_t y=0; y<cv->image.height; y++) {
+      Color tmp = GetImageColor(cv->image, x, y);
+      res += tmp.a * 13 + tmp.r * 23 + tmp.g >> 2 * tmp.b;
+    }
+  }
   return res;
 }
 
 void exportCanvas(const Canvas* cv) {
-  ExportImage(cv->image, TextFormat("%ld.png", hashCanvas(cv)));
+  ExportImage(cv->image, TextFormat("%llu.png", hashCanvas(cv)));
 }
