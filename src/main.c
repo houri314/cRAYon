@@ -90,6 +90,10 @@ int main(int argc, char** argv) {
         if (IsKeyDown(KEY_E)) brush.col.b += 1*mod;
       }
 
+      //User input: Y: yank color under cursor.
+      if (IsKeyPressed(KEY_Y))
+        brush.col = canvasGetColor(&canvas, brush.pos);
+
       updateCanvas(&canvas);
 
     BeginDrawing();
