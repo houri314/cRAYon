@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <raylib.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 
 #include <canvas.h>
@@ -18,13 +19,20 @@ int main(int argc, char** argv) {
   InitWindow(800, 600, "cRAYon - resize window and press O to open new canvas");
 
   Vector2 windowSize;
-  while (!IsKeyPressed(KEY_O)) {
-    windowSize = (Vector2){
-      .x = GetRenderWidth(),
-      .y = GetRenderHeight()
-    };
+  bool fileLoaded = 0;
+  FilePathList file;
+  while (!IsKeyPressed(KEY_O) && !fileLoaded) {
+      windowSize = (Vector2){
+        .x = GetRenderWidth(),
+        .y = GetRenderHeight()
+      };
+      if (IsFileDropped()) {
+        file = LoadDroppedFiles();
+        fileLoaded = 1;
+      }
     BeginDrawing();
       ClearBackground(WHITE);
+      DrawText("Or you can drag and drop an image file here to open it", 0, 0, 20, BLACK);
     EndDrawing();
       //Exit if exit event received (if I put this as while() condition
       //the canvas window will open on exit).
@@ -37,14 +45,25 @@ int main(int argc, char** argv) {
     .size = 10.0f,
     .col = BLACK
   };
+
   float windowOpacity = 1.0f;
   SetConfigFlags(FLAG_VSYNC_HINT);
-  InitWindow(windowSize.x, windowSize.y, "cRAYon");
 
   Canvas canvas;
-  canvas.image = GenImageColor(windowSize.x, windowSize.y, WHITE);
-  canvas.texture = LoadTextureFromImage(canvas.image);
+  if (fileLoaded) {
+    canvas.image = LoadImage(file.paths[0]);
+    UnloadDroppedFiles(file);
+    //Resize window to fit loaded image if necessary.
+    if (windowSize.x != canvas.image.width || windowSize.y != canvas.image.height)
+      windowSize = (Vector2){canvas.image.width, canvas.image.height};
+  }
+  else
+    canvas.image = GenImageColor(windowSize.x, windowSize.y, WHITE);
 
+  InitWindow(windowSize.x, windowSize.y, "cRAYon");
+
+  SetWindowIcon(canvas.image);
+  canvas.texture = LoadTextureFromImage(canvas.image);
   while (!WindowShouldClose()) {
       brush.pos = GetMousePosition();
       int8_t mod = -2*(IsKeyDown(KEY_LEFT_SHIFT))+1;
