@@ -47,6 +47,7 @@ int main(int argc, char** argv) {
 
   while (!WindowShouldClose()) {
       brush.pos = GetMousePosition();
+      int8_t mod = -2*(IsKeyDown(KEY_LEFT_SHIFT))+1;
 
       //Update window title with brush size.
       updateTitle(&brush);
@@ -65,29 +66,28 @@ int main(int argc, char** argv) {
         exportCanvas(&canvas);
 
       //User input: A: increase brush size, with shift: decrease brush size
-      if (IsKeyPressed(KEY_A)) {
-        if (IsKeyDown(KEY_LEFT_SHIFT)) {
-          if (brush.size > 1) brush.size -= 0.5;
-        }
-        else brush.size += 0.5;
-      }
+      if (IsKeyPressed(KEY_A))
+        brush.size += 0.5*mod;
 
       //User input: T: increase window opacity, with shift: decrease window opacity
       if (IsKeyPressed(KEY_T)) {
-        if (IsKeyDown(KEY_LEFT_SHIFT)) {
-          if (windowOpacity > 0) windowOpacity -= 0.2;
-        }
-        else {
-          if (windowOpacity < 1) windowOpacity += 0.2;
-        }
+        windowOpacity += 0.2*mod;
+        if (windowOpacity < 0) windowOpacity = 0;
+        else if (windowOpacity > 1) windowOpacity = 1;
         SetWindowOpacity(windowOpacity);
       }
 
-      //User input: Tab: switch brush color
-      if (IsKeyPressed(KEY_TAB)) {
-        brush.col.r = ~brush.col.r;
-        brush.col.g = ~brush.col.g;
-        brush.col.b = ~brush.col.b;
+      //User input: QWE: change brush color.
+      //With Ctrl held: more precise changing.
+      if (IsKeyDown(KEY_LEFT_CONTROL)) {
+        if (IsKeyPressed(KEY_Q)) brush.col.r += 5*mod;
+        if (IsKeyPressed(KEY_W)) brush.col.g += 5*mod;
+        if (IsKeyPressed(KEY_E)) brush.col.b += 5*mod;
+      }
+      else {
+        if (IsKeyDown(KEY_Q)) brush.col.r += 1*mod;
+        if (IsKeyDown(KEY_W)) brush.col.g += 1*mod;
+        if (IsKeyDown(KEY_E)) brush.col.b += 1*mod;
       }
 
       updateCanvas(&canvas);
