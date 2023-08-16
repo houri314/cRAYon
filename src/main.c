@@ -19,6 +19,7 @@ int main(int argc, char** argv) {
   InitWindow(800, 600, "cRAYon - resize window and press O to open new canvas");
 
   Vector2 windowSize;
+  Vector2 windowPos;
   bool fileLoaded = 0;
   FilePathList file;
   while (!IsKeyPressed(KEY_O) && !fileLoaded) {
@@ -30,6 +31,9 @@ int main(int argc, char** argv) {
         file = LoadDroppedFiles();
         fileLoaded = 1;
       }
+
+      //Saves window position.
+      windowPos = GetWindowPosition();
     BeginDrawing();
       ClearBackground(WHITE);
       DrawText("Or you can drag and drop an image file here to open it", 0, 0, 20, BLACK);
@@ -38,6 +42,7 @@ int main(int argc, char** argv) {
       //the canvas window will open on exit).
       if (WindowShouldClose()) return 0;
   }
+  ClearWindowState(FLAG_WINDOW_RESIZABLE);
   CloseWindow();
 
   //Create the actual window for painting.
@@ -61,6 +66,7 @@ int main(int argc, char** argv) {
     canvas.image = GenImageColor(windowSize.x, windowSize.y, WHITE);
 
   InitWindow(windowSize.x, windowSize.y, "cRAYon");
+  SetWindowPosition(windowPos.x, windowPos.y);
 
   SetWindowIcon(canvas.image);
   canvas.texture = LoadTextureFromImage(canvas.image);
